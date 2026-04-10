@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Digital Pendulum Tracker</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+</head>
+
+<body style="font-family: Arial; text-align:center;">
+
+  <h1>📊 Digital Pendulum Tracker</h1>
+  <h3>Grafik Periode (Realtime)</h3>
+
+  <canvas id="chart" width="400" height="200"></canvas>
+
+  <script>
+    // ================= FIREBASE CONFIG =================
+    var firebaseConfig = {
+      apiKey: "AIzaSyAjY7_yibQhvUQ_xJwR_fkYRVlEn9aYUXQ",
+      authDomain: "digital-pendulum-tracker.firebaseapp.com",
+      databaseURL: "https://PROJECT_ID-default-rtdb.firebaseio.com/",
+      projectId: "digital-pendulum-tracker",
+      storageBucket: "digital-pendulum-tracker.firebasestorage.app",
+      messagingSenderId: "778210804825",
+      appId:  "1:778210804825:web:af5d9b8fdc322777e15d48",
+    };
+
+    firebase.initializeApp(firebaseConfig);
+
+    var database = firebase.database();
+
+    // ================= CHART =================
+    const data = {
+      labels: [],
+      datasets: [{
+        label: 'Periode (detik)',
+        data: [],
+        borderWidth: 2,
+        fill: false
+      }]
+    };
+
+    const config = {
+      type: 'line',
+      data: data,
+      options: {
+        animation: false,
+        scales: {
+          y: {
+            beginAtZero: false
+          }
+        }
+      }
+    };
+
+    const myChart = new Chart(
+      document.getElementById('chart'),
+      config
+    );
+
+    // ================= AMBIL DATA FIREBASE =================
+    database.ref("pendulum/data").on("child_added", function(snapshot) {
+      const val = snapshot.val();
+
+      const periode = val.periode;
+
+      data.labels.push("Data " + data.labels.length);
+      data.datasets[0].data.push(periode);
+
+      myChart.update();
+    });
+
+  </script>
+
+</body>
+</html>
